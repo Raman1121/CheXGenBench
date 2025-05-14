@@ -1,3 +1,42 @@
-Package Version Editable project location
-------- ------- -------------------------
-sana    0.0.1   /raid/s2198939/Sana
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: linux-64
+accelerate==1.6.0
+bitsandbytes==0.45.4
+came-pytorch==0.1.3
+datasets==3.5.0
+decorator==5.2.1
+diffusers==0.33.0.dev0
+dill==0.3.8
+einops==0.8.1
+fairscale==0.4.13
+huggingface-hub==0.30.1
+lightning-utilities==0.14.3
+matplotlib==3.10.1
+matplotlib-inline==0.1.7
+mmcv==1.7.2
+numpy==2.1.2
+omegaconf==2.3.0
+optimum==1.24.0
+pandas==2.2.3
+peft==0.15.1
+pillow==11.1.0
+pip==25.0.1
+prdc==0.2
+protobuf==5.29.4
+pyyaml==6.0.2
+safetensors==0.5.3
+scikit-learn==1.6.1
+scipy==1.15.2
+sentencepiece==0.2.0
+termcolor==3.0.1
+timm==1.0.14
+tokenizers==0.21.1
+# torch==2.4.0+cu121
+torch-fidelity==0.3.0
+# torchaudio==2.4.0
+torchmetrics==1.7.1
+# torchvision==0.19.0
+tqdm==4.67.1
+transformers==4.50.3
+xformers==0.0.27.post2
