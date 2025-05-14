@@ -30,7 +30,6 @@ pip install -r requirements.txt
 ### Training Text-to-Image Models
 We trained 11 different models for this work and the checkpoints are released [here](https://huggingface.co/collections/raman07/chexgenbench-models-6823ec3c57b8ecbcc296e3d2). Training of T2I models de-coupled from this repository i.e. You can train your favourite T2I model using any framework of choice [Diffusers](https://github.com/huggingface/diffusers), [ai-toolkit](https://github.com/ostris/ai-toolkit), etc. 
 
-#### Model Training
 - **Downloading Training Images:** Download the MIMIC-CXR Dataset after accepting the license from [here](https://physionet.org/content/mimic-cxr/2.0.0/).
 - **Using LLaVA-Rad Annotations:** We used LLaVA-Rad Annotations because of enhanced caption quality. They are presented in the `MIMIC_Splits/` folder.
     - Training CSV: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TRAIN.csv`
