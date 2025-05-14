@@ -11,6 +11,7 @@ import torch.nn as nn
 import torchvision.models as models
 
 from PIL import Image, ImageFile
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 from diffusers import (
@@ -22,13 +23,28 @@ from diffusers import (
 )
 from transformers import AutoModel, AutoTokenizer, AutoImageProcessor
 
-SUPPORTED_MODELS = ["SD-V1-4", "SD-V1-5", "SD-V2", "SD-V2-1", "SD-V3-5", "radedit", "sana", "pixart_sigma", "lumina", "flux"]
+SUPPORTED_MODELS = [
+    "SD-V1-4",
+    "SD-V1-5",
+    "SD-V2",
+    "SD-V2-1",
+    "SD-V3-5",
+    "radedit",
+    "sana",
+    "pixart_sigma",
+    "lumina",
+    "flux",
+]
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Calculate privacy metrics.")
-    parser.add_argument("--model_path", type=str, default=None, help="Path of the saved model pipeline.")
-    parser.add_argument("--model_name", type=str, default=None, help="Name of the generative model.")
+    parser.add_argument(
+        "--model_path", type=str, default=None, help="Path of the saved model pipeline."
+    )
+    parser.add_argument(
+        "--model_name", type=str, default=None, help="Name of the generative model."
+    )
     parser.add_argument("--num_shards", type=int, default=0, help="Number of shards.")
     parser.add_argument("--shard", type=int, help="Shard index")
     parser.add_argument(
@@ -52,19 +68,33 @@ def parse_args():
         "--real_img_dir", type=str, help="Directory containing real images."
     )
     parser.add_argument(
-        "--prompt_col", type=str, default="annotated_prompt", help="Column denoting prompts in the CSV."
+        "--prompt_col",
+        type=str,
+        default="annotated_prompt",
+        help="Column denoting prompts in the CSV.",
     )
     parser.add_argument(
-        "--gen_savedir", type=str, default="/pvc/PatientReIdentification", help="Directory where generations would be saved."
+        "--gen_savedir",
+        type=str,
+        default="/pvc/PatientReIdentification",
+        help="Directory where generations would be saved.",
     )
     parser.add_argument(
-        "--results_savedir", type=str, default="/pvc/PatientReIdentification", help="Directory where results would be saved."
+        "--results_savedir",
+        type=str,
+        default="/pvc/PatientReIdentification",
+        help="Directory where results would be saved.",
     )
     parser.add_argument(
-        "--extra_info", type=str, default=None, help="Extra info to save with the results."
+        "--extra_info",
+        type=str,
+        default=None,
+        help="Extra info to save with the results.",
     )
     parser.add_argument(
-        "--save_generations", action="store_true", help="To locally save images generated across different seeds."
+        "--save_generations",
+        action="store_true",
+        help="To locally save images generated across different seeds.",
     )
     return parser.parse_args()
 
@@ -82,30 +112,42 @@ We need to calculate the re-id score between:
 """
 Siamese Network trained to identify if two images belong to the same patient or not
 """
+
+
 class SiameseNetwork(nn.Module):
-    def __init__(self, network='ResNet-50', in_channels=3, n_features=128):
+    def __init__(self, network="ResNet-50", in_channels=3, n_features=128):
         super(SiameseNetwork, self).__init__()
         self.network = network
         self.in_channels = in_channels
         self.n_features = n_features
 
-        if self.network == 'ResNet-50':
+        if self.network == "ResNet-50":
             # Model: Use ResNet-50 architecture
             self.model = models.resnet50(pretrained=True)
             # Adjust the input layer: either 1 or 3 input channels
             if self.in_channels == 1:
-                self.model.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+                self.model.conv1 = nn.Conv2d(
+                    1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False
+                )
             elif self.in_channels == 3:
                 pass
             else:
                 raise Exception(
-                    'Invalid argument: ' + self.in_channels + '\nChoose either in_channels=1 or in_channels=3')
+                    "Invalid argument: "
+                    + self.in_channels
+                    + "\nChoose either in_channels=1 or in_channels=3"
+                )
             # Adjust the ResNet classification layer to produce feature vectors of a specific size
-            self.model.fc = nn.Linear(in_features=2048, out_features=self.n_features, bias=True)
+            self.model.fc = nn.Linear(
+                in_features=2048, out_features=self.n_features, bias=True
+            )
 
         else:
-            raise Exception('Invalid argument: ' + self.network +
-                            '\nChoose ResNet-50! Other architectures are not yet implemented in this framework.')
+            raise Exception(
+                "Invalid argument: "
+                + self.network
+                + "\nChoose ResNet-50! Other architectures are not yet implemented in this framework."
+            )
 
         self.fc_end = nn.Linear(self.n_features, 1)
 
@@ -127,6 +169,7 @@ class SiameseNetwork(nn.Module):
         output = self.fc_end(difference)
 
         return output
+
 
 ####################################################################################################
 
@@ -267,6 +310,7 @@ def load_sd35_lora_pipeline(model_path, device):
 
 def load_sana_pipeline(model_path):
     from diffusers import SanaPipeline
+
     pipe = SanaPipeline.from_pretrained(
         model_path,
         torch_dtype=torch.float16,
@@ -274,8 +318,10 @@ def load_sana_pipeline(model_path):
 
     return pipe
 
+
 def load_pixart_pipeline(model_path):
     from diffusers import PixArtSigmaPipeline
+
     weight_dtype = torch.float16
 
     pipe = PixArtSigmaPipeline.from_pretrained(
@@ -285,6 +331,7 @@ def load_pixart_pipeline(model_path):
     )
 
     return pipe
+
 
 def load_lumina_pipeline(model_path, device):
     print("!! Loading Lumina 2.0 with LoRA Pipeline")
@@ -296,21 +343,22 @@ def load_lumina_pipeline(model_path, device):
 
     print(f"Loading base pipeline: {base_model_id}")
     pipe = AutoPipelineForText2Image.from_pretrained(
-        base_model_id, 
-        torch_dtype=dtype).to(device)
+        base_model_id, torch_dtype=dtype
+    ).to(device)
 
     print("Base pipeline loaded.")
 
     print(f"Loading LoRA weights from: {lora_weights_path}")
 
     pipe.load_lora_weights(
-        model_path,              # Directory path
-        weight_name=lora_weights_filename, # Specific filename
-        adapter_name="lumina2_medium_finetune_MIMIC" # Optional: Give your LoRA adapter a name
+        model_path,  # Directory path
+        weight_name=lora_weights_filename,  # Specific filename
+        adapter_name="lumina2_medium_finetune_MIMIC",  # Optional: Give your LoRA adapter a name
     )
     print("LoRA weights loaded successfully.")
 
     return pipe
+
 
 def load_pipeline(model_name, model_path):
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -322,25 +370,30 @@ def load_pipeline(model_name, model_path):
 
     # SD V1/ V2.x Models
     # elif ("V1" in model_path) or ("V2" in model_path):
-    elif((model_name == "SD-V1-4") or (model_name == "SD-V1-5") or (model_name == "SD-V2") or (model_name == "SD-V2-1")):
+    elif (
+        (model_name == "SD-V1-4")
+        or (model_name == "SD-V1-5")
+        or (model_name == "SD-V2")
+        or (model_name == "SD-V2-1")
+    ):
         pipe = load_sd_pipeline(model_path)
         pipe = pipe.to(device)
 
     # SD 3.5 Medium with LoRA
-    elif(model_name == "SD-V3-5"):
+    elif model_name == "SD-V3-5":
         pipe = load_sd35_lora_pipeline(model_path, device)
 
     # Sana 0.6B (512)
-    elif(model_name == "sana"):
+    elif model_name == "sana":
         pipe = load_sana_pipeline(model_path)
         pipe = pipe.to(device)
 
     # Pixart Sigma
-    elif(model_name == "pixart_sigma"):
+    elif model_name == "pixart_sigma":
         pipe = load_pixart_pipeline(model_path)
         pipe = pipe.to(device)
 
-    elif(model_name == "lumina"):
+    elif model_name == "lumina":
         pipe = load_lumina_pipeline(model_path, device)
         pipe = pipe.to(device)
 
@@ -368,7 +421,9 @@ def pixelwise_distance(image1: Image.Image, image2: Image.Image) -> float:
     arr1 = np.array(image1)
     arr2 = np.array(image2)
     if arr1.shape != arr2.shape:
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         raise ValueError("Images must have the same shape.")
 
     distance = np.linalg.norm(arr1 - arr2)
@@ -391,35 +446,34 @@ def main(args):
 
     seed_everything(42)
     assert args.model_name is not None
-    if(args.model_name != "radedit"):
+    if args.model_name != "radedit":
         assert args.model_path is not None  # RadEdit is directly fetched from HF!
 
     if args.num_shards > 0:
         assert args.shard is not None
 
     PIPELINE_CONSTANTS = {
-        
-        "radedit":{
+        "radedit": {
             "num_inference_steps": 100,
             "guidance_scale": 7.5,
             "num_images_per_prompt": 1,
         },
-        "SD-V1-4":{
+        "SD-V1-4": {
             "num_inference_steps": 50,
             "guidance_scale": 7.5,
             "num_images_per_prompt": 1,
         },
-        "SD-V1-5":{
+        "SD-V1-5": {
             "num_inference_steps": 50,
             "guidance_scale": 7.5,
             "num_images_per_prompt": 1,
         },
-        "SD-V2":{
+        "SD-V2": {
             "num_inference_steps": 50,
             "guidance_scale": 7.5,
             "num_images_per_prompt": 1,
         },
-        "SD-V2-1":{
+        "SD-V2-1": {
             "num_inference_steps": 50,
             "guidance_scale": 7.5,
             "num_images_per_prompt": 1,
@@ -437,14 +491,12 @@ def main(args):
         "pixart_sigma": {
             "num_inference_steps": 20,
             "guidance_scale": 4.5,
-        }
+        },
     }
 
-    model = SiameseNetwork(
-                network="ResNet-50", 
-                in_channels=3, 
-                n_features=128
-            ).to("cuda")
+    model = SiameseNetwork(network="ResNet-50", in_channels=3, n_features=128).to(
+        "cuda"
+    )
 
     # Loading ckpt
     print("Loading Re-ID Model")
@@ -455,20 +507,18 @@ def main(args):
 
     print("Loading data...")
     df_train = pd.read_csv(args.real_csv)
-    df_train["path"] = df_train["path"].apply(lambda x: os.path.join(args.real_img_dir, x))
+    df_train["path"] = df_train["path"].apply(
+        lambda x: os.path.join(args.real_img_dir, x)
+    )
     print("Data loaded successfully!")
 
     df_combined = df_train
 
     # Selecting only unique prompts
-    _df = df_combined.drop_duplicates(subset=[args.prompt_col]).reset_index(
-        drop=True
-    )
+    _df = df_combined.drop_duplicates(subset=[args.prompt_col]).reset_index(drop=True)
 
     # Removing prompts with nans
-    _df = _df.dropna(subset=[args.prompt_col]).reset_index(
-        drop=True
-    )
+    _df = _df.dropna(subset=[args.prompt_col]).reset_index(drop=True)
 
     if args.subset:
         _df = _df.sample(n=args.subset, random_state=42).reset_index(drop=True)
@@ -515,10 +565,15 @@ def main(args):
     print("Done!")
 
     GEN_SAVE_DIR = os.path.join(args.gen_savedir, args.model_name)
-    if(args.extra_info):
-        GEN_SAVE_DIR = os.path.join(args.gen_savedir, args.model_name + "_" + args.extra_info)
+    if args.extra_info:
+        GEN_SAVE_DIR = os.path.join(
+            args.gen_savedir, args.model_name + "_" + args.extra_info
+        )
     os.makedirs(GEN_SAVE_DIR, exist_ok=True)
-    print("Generations across multiple prompts and seeds would be saved at: ", GEN_SAVE_DIR)
+    print(
+        "Generations across multiple prompts and seeds would be saved at: ",
+        GEN_SAVE_DIR,
+    )
 
     for i in tqdm(range(len(_df))):
         _PATH = _df["path"][i]
@@ -542,19 +597,19 @@ def main(args):
         # Generate images using this prompt
         for _seed in SEEDS:
             print("Generating with seed: ", _seed)
-            
+
             gen_image = generate_synthetic_images(
                 pipe, PIPELINE_CONSTANTS[args.model_name], _PROMPT, _seed
             )
             gen_image = gen_image.convert("RGB")
-            generated_images.append(gen_image)                
+            generated_images.append(gen_image)
 
         # Calculate Re-id score between the real and the generated images
         print("Calculating Re-ID Scores!")
         for i, gen_img in enumerate(generated_images):
 
             # Save the generated image
-            if(args.save_generations):
+            if args.save_generations:
                 gen_img.save(
                     os.path.join(GEN_SAVE_DIR, filename + "_gen_{}.jpg".format(i))
                 )
@@ -618,13 +673,13 @@ def main(args):
     results_name = f"privacy_metrics_{args.model_name}.csv"
 
     # If shards used
-    if(args.num_shards == 0):
+    if args.num_shards == 0:
         results_name = f"privacy_metrics_{args.model_name}_shard_{args.shard}.csv"
 
     # If given extra info
-    if(args.extra_info):
+    if args.extra_info:
         results_name = f"privacy_metrics_{args.model_name}_{args.extra_info}.csv"
-    
+
     errors_name = (
         f"error.csv" if args.num_shards == 0 else f"error_shard_{args.shard}.csv"
     )

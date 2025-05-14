@@ -15,11 +15,13 @@ from torchmetrics.image.inception import InceptionScore
 from torchmetrics.image.kid import KernelInceptionDistance
 import argparse
 import warnings
+
 warnings.filterwarnings("ignore")
 from transformers import AutoModel, AutoTokenizer, AutoImageProcessor
 from termcolor import colored
 
 from prdc import compute_prdc
+
 
 def seed_everything(seed=42):
     random.seed(seed)
@@ -37,14 +39,15 @@ def load_RadDino_encoder():
 
     return model, processor
 
+
 # PRDC Metric from: https://proceedings.mlr.press/v119/naeem20a/naeem20a.pdf
 def compute_prdc_metric(real_features, synthetic_features):
     nearest_k = 5
     metrics = compute_prdc(
-                real_features=real_features,
-                fake_features=synthetic_features,
-                nearest_k=nearest_k
-                )
+        real_features=real_features,
+        fake_features=synthetic_features,
+        nearest_k=nearest_k,
+    )
 
     return metrics
 
@@ -104,27 +107,44 @@ class ImageDataset(Dataset):
             blank = Image.new("RGB", (299, 299), (0, 0, 0))
             return self.transform(blank)
 
+
 def get_labels_dict_from_string(x):
     return ast.literal_eval(x)
 
-MIMIC_PATHOLOGIES = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 
-                     'Edema', 'Enlarged Cardiomediastinum', 'Fracture', 
-                     'Lung Lesion', 'Lung Opacity', 'No Finding', 'Pleural Effusion', 
-                     'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices']
+
+MIMIC_PATHOLOGIES = [
+    "Atelectasis",
+    "Cardiomegaly",
+    "Consolidation",
+    "Edema",
+    "Enlarged Cardiomediastinum",
+    "Fracture",
+    "Lung Lesion",
+    "Lung Opacity",
+    "No Finding",
+    "Pleural Effusion",
+    "Pleural Other",
+    "Pneumonia",
+    "Pneumothorax",
+    "Support Devices",
+]
+
 
 def main(args):
 
-    if(args.num_shards == -1):
+    if args.num_shards == -1:
         args.num_shards = None
-    if(args.shard == -1):
+    if args.shard == -1:
         args.shard = None
 
-    if(args.experiment_type == 'conditional'):
+    if args.experiment_type == "conditional":
         assert args.pathology is not None
         assert args.pathology in MIMIC_PATHOLOGIES
 
     if args.debug:
-        print(colored("Debug mode is ON. Make sure this behavior is intended.", "yellow"))
+        print(
+            colored("Debug mode is ON. Make sure this behavior is intended.", "yellow")
+        )
 
     # Set random seed for reproducibility
     seed_everything(42)
@@ -150,7 +170,7 @@ def main(args):
     real_df = real_df.drop_duplicates(subset=[args.real_caption_col]).reset_index(
         drop=True
     )
-        
+
     ######### Synthetic Data #########
 
     # Load synthetic images
@@ -166,44 +186,49 @@ def main(args):
         lambda x: os.path.join(args.synthetic_img_dir, x)
     )
 
-    
     # Implement the logic for running analysis on conditional prompts i.e. Calculating metrics only for a specific pathology
-    if(args.experiment_type == 'conditional'):
+    if args.experiment_type == "conditional":
 
-        print(colored(f"Calculating metrics for the samples containing the pathology: {args.pathology}", "yellow"))
-        real_df['chexpert_labels'] = real_df['chexpert_labels'].apply(get_labels_dict_from_string)
+        print(
+            colored(
+                f"Calculating metrics for the samples containing the pathology: {args.pathology}",
+                "yellow",
+            )
+        )
+        real_df["chexpert_labels"] = real_df["chexpert_labels"].apply(
+            get_labels_dict_from_string
+        )
         # Create a separate column for pathology labels
         for col in MIMIC_PATHOLOGIES:
-            real_df[col] = real_df['chexpert_labels'].apply(lambda x: x[col])
-        
+            real_df[col] = real_df["chexpert_labels"].apply(lambda x: x[col])
+
         # Fill NaN values with 0
         real_df.fillna(0, inplace=True)
 
         # Create a subset of the real dataset with the specified pathology
         real_df = real_df[real_df[args.pathology] == 1].reset_index(drop=True)
-        
+
         # Include only those images from the synthetic dataset that have the same prompts as the real dataset containing the pathology
         real_prompts = real_df[args.real_caption_col].to_list()
-        synthetic_df = synthetic_df[synthetic_df['prompt'].isin(real_prompts)].reset_index(drop=True)
+        synthetic_df = synthetic_df[
+            synthetic_df["prompt"].isin(real_prompts)
+        ].reset_index(drop=True)
 
         # import pdb; pdb.set_trace()
-    
-    real_image_paths = real_df[
-        args.real_img_col
-    ].tolist()  
-    
+
+    real_image_paths = real_df[args.real_img_col].tolist()
+
     synthetic_image_paths = synthetic_df[
         args.synthetic_img_col
     ].tolist()  # The image path col in the CSV is 'img_savename'
 
-    if(args.num_shards is not None):
+    if args.num_shards is not None:
         print(colored(f"Dividing the dataset into {args.num_shards} shards.", "yellow"))
         print(colored(f"Shard Index: {args.shard}", "yellow"))
         ALL_REAL_PATHS = np.array_split(real_image_paths, args.num_shards)
         ALL_SYNTHETIC_PATHS = np.array_split(synthetic_image_paths, args.num_shards)
         real_image_paths = ALL_REAL_PATHS[args.shard]
         synthetic_image_paths = ALL_SYNTHETIC_PATHS[args.shard]
-
 
     # Define transform for loading images
     # Note: torchmetrics FID expects images in range [0, 1] without normalization
@@ -229,7 +254,10 @@ def main(args):
     )
 
     print(
-        colored(f"Processing {len(real_dataset)} real images and {len(synthetic_dataset)} synthetic images...", 'yellow')
+        colored(
+            f"Processing {len(real_dataset)} real images and {len(synthetic_dataset)} synthetic images...",
+            "yellow",
+        )
     )
 
     # Initialize metrics
@@ -239,11 +267,13 @@ def main(args):
     rad_dino_fe = RadDinoFeatureExtractor(model, processor)
     fid_raddino = FrechetInceptionDistance(feature=rad_dino_fe).to(device)
 
-    NUM_KID_SUBSETS = 100   # Default
+    NUM_KID_SUBSETS = 100  # Default
     KID_SUBSET_SIZE = min(len(synthetic_dataset), len(real_dataset))
 
     kid = KernelInceptionDistance(subset_size=KID_SUBSET_SIZE, feature=2048).to(device)
-    kid_raddino = KernelInceptionDistance(subset_size=KID_SUBSET_SIZE, feature=rad_dino_fe).to(device)
+    kid_raddino = KernelInceptionDistance(
+        subset_size=KID_SUBSET_SIZE, feature=rad_dino_fe
+    ).to(device)
 
     inception_score = InceptionScore(feature=2048).to(device)
 
@@ -317,7 +347,7 @@ def main(args):
         "FID (RadDino)": round(fid_raddino_value.item(), 3),
         "Inception Score": round(is_mean.item(), 3),
         "KID": round(kid_mean.item(), 3),
-        'KID (RadDino)': round(kid_raddino_mean.item(), 3),
+        "KID (RadDino)": round(kid_raddino_mean.item(), 3),
         "Precision": round(prdc_metrics["precision"].item(), 3),
         "Recall": round(prdc_metrics["recall"].item(), 3),
         "Density": round(prdc_metrics["density"].item(), 3),
@@ -329,22 +359,22 @@ def main(args):
         # 'KID (std)': kid_std.item(),
     }
 
-    if(args.experiment_type == 'conditional'):
-        results['Pathology'] = args.pathology
+    if args.experiment_type == "conditional":
+        results["Pathology"] = args.pathology
 
     print("RESULTS ... ")
     # print(colored(results, "green"))
-    for k,v in results.items():
+    for k, v in results.items():
         print(colored(f"{k}: {v}", "green"))
 
     # Save to CSV
     results_df = pd.DataFrame([results])
 
     def prepare_savename(args):
-        if args.experiment_type == 'conditional':
+        if args.experiment_type == "conditional":
             savename = "conditional_image_generation_metrics.csv"
         else:
-            if(args.num_shards is not None):
+            if args.num_shards is not None:
                 savename = f"image_generation_metrics_shard_{args.shard}.csv"
             else:
                 savename = "image_generation_metrics.csv"
@@ -353,15 +383,14 @@ def main(args):
             savename = "debug_" + savename
 
         return savename
-    
+
     savename = prepare_savename(args)
-    
+
     savepath = (
         os.path.join(args.results_savedir, "saved_shards", savename)
         if args.num_shards is not None
         else os.path.join(args.results_savedir, savename)
     )
-
 
     if os.path.exists(savepath):
         print("Appending to existing results file.")
@@ -431,7 +460,10 @@ if __name__ == "__main__":
         "--num_workers", type=int, default=4, help="Number of workers for data loading."
     )
     parser.add_argument(
-        "--extra_info", type=str, default="Some AI Model", help="Extra info to link the results with the specific model."
+        "--extra_info",
+        type=str,
+        default="Some AI Model",
+        help="Extra info to link the results with the specific model.",
     )
 
     parser.add_argument(
@@ -443,27 +475,29 @@ if __name__ == "__main__":
 
     # Experiment Arguments
     parser.add_argument(
-        "--experiment_type", type=str, default=None, help="Type of experiment to run (regular, conditional)"
+        "--experiment_type",
+        type=str,
+        default=None,
+        help="Type of experiment to run (regular, conditional)",
     )
     parser.add_argument(
-        "--pathology", type=str, default='regular', help="Type of experiment to run (regular, conditional)"
+        "--pathology",
+        type=str,
+        default="regular",
+        help="Type of experiment to run (regular, conditional)",
     )
 
     parser.add_argument(
         "--num_shards", type=int, default=-1, help="Number of shards to divide into."
     )
-    parser.add_argument(
-        "--shard", type=int, default=None, help="Shard Index."
-    )
+    parser.add_argument("--shard", type=int, default=None, help="Shard Index.")
 
     parser.add_argument(
         "--debug",
         action="store_true",
         help="Debug mode to run on a small subset of data.",
     )
-    parser.add_argument(
-        "--debug_samples", type=int, default=100, help="Debug Samples."
-    )
+    parser.add_argument("--debug_samples", type=int, default=100, help="Debug Samples.")
 
     args = parser.parse_args()
     main(args)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export SYNTHETIC_CSV="assets/CSV/prompt_INFO.csv"
-export SYNTHETIC_IMG_DIR="assets/synthetic_images/"
+export SYNTHETIC_IMG_DIR="assets/synthetic_images/" # Assuming the synthetic images from your T2I model are in this folder. You can give a different folder path as well!
 
 export RESULTS_SAVEDIR="Results"
 
@@ -26,6 +26,6 @@ for pathology in "${MIMIC_PATHOLOGIES[@]}"; do
     echo "Calculating FID, KID, IS ..."
     ./scripts/fid.sh
 
-    # echo "Calculating Image Text Alignment Scores ..."
-    # ./scripts/img_text_alignment.sh
+    echo "Calculating Image Text Alignment Scores ..."
+    ./scripts/img_text_alignment.sh
 done
