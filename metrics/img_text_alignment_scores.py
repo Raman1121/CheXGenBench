@@ -183,10 +183,7 @@ def main(args):
 
         # Load real images
         real_df = pd.read_csv(real_csv)
-        # Creating paths to the images
-        # real_df[args.real_img_col] = real_df[args.real_img_col].apply(
-        #     lambda x: os.path.join(args.real_img_dir, x)
-        # )
+
         # Drop rows with duplicate prompts
         real_df = real_df.drop_duplicates(subset=[args.real_caption_col]).reset_index(
             drop=True
@@ -236,13 +233,13 @@ def main(args):
     print(colored(f"Mean Img-Text Alignment Score: {mean_alignment_scores}", "green"))
 
     savename = (
-        "conditional_image_generation_metrics.csv"
+        "conditional_img_text_alignment.csv"
         if args.experiment_type == "conditional"
-        else "image_generation_metrics.csv"
+        else "img_text_alignment.csv"
     )
     if args.debug:
         savename = "debug_" + savename
-    # savename = "image_generation_metrics_debug.csv"
+
     savepath = os.path.join(args.results_savedir, savename)
 
     # Try to read if the dataframe already exists
@@ -252,15 +249,17 @@ def main(args):
             colored(f"Appending to existing results file found at {savepath}", "yellow")
         )
         results_df = pd.read_csv(savepath)
-        # results_df["Alignment_score"] = mean_alignment_scores
-        # results_df["Extra Info"] = args.extra_info
-        # results_df.iloc[-1]["Alignment_score"] = mean_alignment_scores
-        # results_df.iloc[-1]["Extra Info"] = args.extra_info
-        results_df.loc[results_df.index[-1], "Alignment_score"] = mean_alignment_scores
+
+        # Append a new row with the new results
+        new_row = {
+            "Alignment_score": mean_alignment_scores,
+            "Extra Info": args.extra_info,
+        }
 
         if args.experiment_type == "conditional":
-            results_df.loc[results_df.index[-1], "Pathology"] = args.pathology
+            new_row["Pathology"] = args.pathology
 
+        results_df.loc[len(results_df)] = new_row
         results_df.to_csv(savepath, index=False)
         print(colored(f"Image-Text Alignment Scores saved to: {savepath}", "green"))
     else:

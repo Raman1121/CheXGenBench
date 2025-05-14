@@ -214,8 +214,6 @@ def main(args):
             synthetic_df["prompt"].isin(real_prompts)
         ].reset_index(drop=True)
 
-        # import pdb; pdb.set_trace()
-
     real_image_paths = real_df[args.real_img_col].tolist()
 
     synthetic_image_paths = synthetic_df[
@@ -352,18 +350,13 @@ def main(args):
         "Recall": round(prdc_metrics["recall"].item(), 3),
         "Density": round(prdc_metrics["density"].item(), 3),
         "Coverage": round(prdc_metrics["coverage"].item(), 3),
-        "Alignment_score": np.nan,
         "Extra Info": args.extra_info,
-        # "KID (std)": round(kid_std.item(), 3),
-        # 'KID (RadDino std)': round(kid_raddino_std.item(), 3),
-        # 'KID (std)': kid_std.item(),
     }
 
     if args.experiment_type == "conditional":
         results["Pathology"] = args.pathology
 
     print("RESULTS ... ")
-    # print(colored(results, "green"))
     for k, v in results.items():
         print(colored(f"{k}: {v}", "green"))
 
