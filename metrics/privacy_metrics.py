@@ -22,6 +22,8 @@ from diffusers import (
 )
 from transformers import AutoModel, AutoTokenizer, AutoImageProcessor
 
+SUPPORTED_MODELS = ["SD-V1-4", "SD-V1-5", "SD-V2", "SD-V2-1", "SD-V3-5", "radedit", "sana", "pixart_sigma", "lumina", "flux"]
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Calculate privacy metrics.")
@@ -60,6 +62,9 @@ def parse_args():
     )
     parser.add_argument(
         "--extra_info", type=str, default=None, help="Extra info to save with the results."
+    )
+    parser.add_argument(
+        "--save_generations", action="store_true", help="To locally save images generated across different seeds."
     )
     return parser.parse_args()
 
@@ -549,9 +554,10 @@ def main(args):
         for i, gen_img in enumerate(generated_images):
 
             # Save the generated image
-            gen_img.save(
-                os.path.join(GEN_SAVE_DIR, filename + "_gen_{}.jpg".format(i))
-            )
+            if(args.save_generations):
+                gen_img.save(
+                    os.path.join(GEN_SAVE_DIR, filename + "_gen_{}.jpg".format(i))
+                )
 
             # Re-Identification Score
             reid_score = round(
@@ -609,31 +615,28 @@ def main(args):
     print(results_df)
     os.makedirs(args.results_savedir, exist_ok=True)
 
-    try:
-        results_name = f"privacy_metrics_{args.model_name}.csv"
+    results_name = f"privacy_metrics_{args.model_name}.csv"
 
-        # If shards used
-        if(args.num_shards == 0):
-            results_name = f"privacy_metrics_{args.model_name}_shard_{args.shard}.csv"
+    # If shards used
+    if(args.num_shards == 0):
+        results_name = f"privacy_metrics_{args.model_name}_shard_{args.shard}.csv"
 
-        # If given extra info
-        if(args.extra_info):
-            results_name = f"privacy_metrics_{args.model_name}_{args.extra_info}.csv"
-        
-        errors_name = (
-            f"error.csv" if args.num_shards == 0 else f"error_shard_{args.shard}.csv"
-        )
-        results_df.to_csv(os.path.join(args.results_savedir, results_name), index=False)
-        print("Results saved at: ", os.path.join(args.results_savedir, results_name))
+    # If given extra info
+    if(args.extra_info):
+        results_name = f"privacy_metrics_{args.model_name}_{args.extra_info}.csv"
+    
+    errors_name = (
+        f"error.csv" if args.num_shards == 0 else f"error_shard_{args.shard}.csv"
+    )
+    results_df.to_csv(os.path.join(args.results_savedir, results_name), index=False)
+    print("Results saved at: ", os.path.join(args.results_savedir, results_name))
 
-        ## Saving errored files
-        if len(ERROR_PROMPTS) > 0:
-            errors_df = pd.DataFrame()
-            errors_df["Error_Prompts"] = ERROR_PROMPTS
-            errors_df.to_csv(os.path.join(args.results_savedir, errors_name), index=False)
-            print("Errors saved at: ", os.path.join(args.results_savedir, errors_name))
-    except:
-        print("Failed to save the Results CSV")
+    ## Saving errored files
+    if len(ERROR_PROMPTS) > 0:
+        errors_df = pd.DataFrame()
+        errors_df["Error_Prompts"] = ERROR_PROMPTS
+        errors_df.to_csv(os.path.join(args.results_savedir, errors_name), index=False)
+        print("Errors saved at: ", os.path.join(args.results_savedir, errors_name))
 
 
 if __name__ == "__main__":

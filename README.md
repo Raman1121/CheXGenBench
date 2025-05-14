@@ -84,6 +84,10 @@ The results would be stored in `Results/conditional_image_generation_metrics.csv
 
 ![](assets/images/Privacy-Metrics.png)
 
+- First, download the Patient Re-Identification Model from [HERE](https://huggingface.co/raman07/Patient_ReIdentification_MIMIC/blob/main/ResNet-50_epoch11_data_handling_RPN.pth) and place it in `assets/checkpoints/` folder. The name of the checkpoint is *ResNet-50_epoch11_data_handling_RPN.pth*.
+
+- Set the appropriate paths and constants in the `scripts/privacy_metrics.sh` file.
+
 Run the following script to calculate privacy and patient re-identification metrics.
 ```bash
 cd Benchmarking-Synthetic-Data
