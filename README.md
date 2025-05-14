@@ -2,18 +2,17 @@
 
 ![](assets/images/chexgenbench-overview.png)
 
-<!-- ## Contents -->
+## Fine-Tuned Checkpoints
 
-<!-- - [Overview](#overview)
-    - [Quantitative Analysis](#quantitative-analysis)
-        - [Generative Quality Metrics](#generative-quality-metrics)
-        - [Diversity and Mode Coverage Metrics](#diversity-and-mode-coverage-metrics)
-    - [Qualitative Analysis](#qualitative-analysis)
-- [Usage](#usage)
-    - [Generating Synthetic Data](#generating-synthetic-data)
-    - [Calculating Global Metrics](#calculating-global-metrics)
-    - [Calculating Conditional Metrics](#calculating-conditional-metrics)
-    - [Calculating Privacy Metrics](#privacy-metrics) -->
+We provide different fine-tuned checkpoints as a collection on [HuggingFace](https://huggingface.co/collections/raman07/chexgenbench-models-6823ec3c57b8ecbcc296e3d2).
+
+## SynthCheX-75K Dataset
+We additionally release the SynthCheX-75K dataset comprising of >75K high-quality, synthetic radiographs using the best-performing model from our benchmark. The dataset is available for use on [HuggingFace](https://huggingface.co/datasets/raman07/SynthCheX-75K).
+
+More details on the dataset are provided [here](SynthCheX_README.md).
+
+## CheXGenBench
+The benchmark is available [on GitHub](https://github.com/Raman1121/CheXGenBench).
 
 # Environment Setup
 - Python>=3.10.0
