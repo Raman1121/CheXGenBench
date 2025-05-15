@@ -7,7 +7,7 @@
 We provide different fine-tuned checkpoints as a collection on [HuggingFace](https://huggingface.co/collections/raman07/chexgenbench-models-6823ec3c57b8ecbcc296e3d2).
 
 ## SynthCheX-75K Dataset
-We additionally release the SynthCheX-75K dataset comprising of >75K high-quality, synthetic radiographs using the best-performing model from our benchmark. The dataset is available for use on [HuggingFace](https://huggingface.co/datasets/raman07/SynthCheX-75K).
+We additionally release the SynthCheX-75K dataset comprising of >75K high-quality, synthetic radiographs using the best-performing model from our benchmark. The dataset is available for use on [HuggingFace](https://huggingface.co/datasets/raman07/SynthCheX-75K-v2).
 
 More details on the dataset are provided [here](SynthCheX_README.md).
 
