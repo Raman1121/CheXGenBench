@@ -31,8 +31,11 @@ We trained 11 different models for this work and the checkpoints are released [h
 
 - **Downloading Training Images:** Download the MIMIC-CXR Dataset after accepting the license from [here](https://physionet.org/content/mimic-cxr/2.0.0/).
 - **Using LLaVA-Rad Annotations:** We used LLaVA-Rad Annotations because of enhanced caption quality. They are presented in the `MIMIC_Splits/` folder.
-    - Training CSV: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TRAIN.csv`
-    - Test CSV: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv`
+    - `cd MIMIC_Splits/`
+    - `unzip llavarad_annotations.zip`
+    - You will see the following CSV files
+        - **Training CSV**: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TRAIN.csv`
+        - **Test CSV**: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv`
 
 - **Data Organization:** Once training is finished, use the `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv` file to generate images for evaluation. Ensure that during generation, you save both the **original prompt** and the generated **synthetic image**. Organize this data into a CSV file with the following columns:
     - `'prompt'`: Contains the text prompt used for generation.
