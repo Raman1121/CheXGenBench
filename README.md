@@ -40,11 +40,12 @@ We trained 11 different models for this work and the checkpoints are released [h
         - **Training CSV**: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TRAIN.csv`
         - **Test CSV**: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv`
 
-- **Data Organization:** Once training is finished, use the `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv` file to generate images for evaluation. Ensure that during generation, you save both the **original prompt** and the generated **synthetic image**. Organize this data into a CSV file with the following columns:
+- **Data Organization:** Once you have trained your T2I model, use the `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv` file to generate images for evaluation. Ensure that during generation, you save both the **original prompt** and the generated **synthetic image** in a CSV file (lets call it `prompt_INFO.csv`). Check out `tools/generate_data_common.py` for reference. 
+- Organize the synthetic data into a CSV file (`prompt_INFO.csv`) with the following columns:
     - `'prompt'`: Contains the text prompt used for generation.
     - `'img_savename'`: Contains the filename (or path) of the saved synthetic image.
 - **File Placement:** After generating all the synthetic images and creating the CSV file:
-    - Place the generated CSV file containing the prompts and image filenames in the `assets/CSV` directory.
+    - Place the generated CSV file (`prompt_INFO.csv`) in the `assets/CSV` directory.
     - Place all the generated synthetic image files in the `assets/synthetic_images` directory.
 
 # Usage
@@ -74,6 +75,8 @@ cd Benchmarking-Synthetic-Data
 The results would be stored in `Results/image_generation_metrics.csv`
 
 **Conditional Analysis:** This level calculates each metric separately for each individual pathology present in the dataset. This allows for a detailed assessment of how well the T2I model generates synthetic data for specific medical conditions.
+
+![](assets/images/conditional-metrics.png)
 
 ```bash
 cd Benchmarking-Synthetic-Data
