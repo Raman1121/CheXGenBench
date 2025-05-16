@@ -1,6 +1,9 @@
 # CheXGenBench: A Unified Benchmark For Fidelity, Privacy and Utility of Synthetic Chest Radiographs
 
+
 ![](assets/images/chexgenbench-overview.png)
+
+[Check out the pre-print on Arxiv](https://www.arxiv.org/abs/2505.10496)
 
 ## Fine-Tuned Checkpoints
 

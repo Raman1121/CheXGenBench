@@ -5,7 +5,8 @@ from __future__ import annotations
 
 import argparse
 import os
-os.environ['TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD'] = "1"
+
+os.environ["TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD"] = "1"
 
 from contextlib import nullcontext
 
@@ -68,57 +69,89 @@ def main(args):
         file_path = args.orig_ckpt_path
 
     print(colored(f"Loading checkpoint from {file_path}", "green", attrs=["bold"]))
-    
+
     all_state_dict = torch.load(file_path, weights_only=False)
-    
+
     state_dict = all_state_dict.pop("state_dict")
     converted_state_dict = {}
 
     # Patch embeddings.
-    converted_state_dict["patch_embed.proj.weight"] = state_dict.pop("x_embedder.proj.weight")
-    converted_state_dict["patch_embed.proj.bias"] = state_dict.pop("x_embedder.proj.bias")
+    converted_state_dict["patch_embed.proj.weight"] = state_dict.pop(
+        "x_embedder.proj.weight"
+    )
+    converted_state_dict["patch_embed.proj.bias"] = state_dict.pop(
+        "x_embedder.proj.bias"
+    )
 
     # Caption projection.
-    converted_state_dict["caption_projection.linear_1.weight"] = state_dict.pop("y_embedder.y_proj.fc1.weight")
-    converted_state_dict["caption_projection.linear_1.bias"] = state_dict.pop("y_embedder.y_proj.fc1.bias")
-    converted_state_dict["caption_projection.linear_2.weight"] = state_dict.pop("y_embedder.y_proj.fc2.weight")
-    converted_state_dict["caption_projection.linear_2.bias"] = state_dict.pop("y_embedder.y_proj.fc2.bias")
+    converted_state_dict["caption_projection.linear_1.weight"] = state_dict.pop(
+        "y_embedder.y_proj.fc1.weight"
+    )
+    converted_state_dict["caption_projection.linear_1.bias"] = state_dict.pop(
+        "y_embedder.y_proj.fc1.bias"
+    )
+    converted_state_dict["caption_projection.linear_2.weight"] = state_dict.pop(
+        "y_embedder.y_proj.fc2.weight"
+    )
+    converted_state_dict["caption_projection.linear_2.bias"] = state_dict.pop(
+        "y_embedder.y_proj.fc2.bias"
+    )
 
     # Handle different time embedding structure based on model type
 
     if args.model_type in ["SanaSprint_1600M_P1_D20", "SanaSprint_600M_P1_D28"]:
         # For Sana Sprint, the time embedding structure is different
-        converted_state_dict["time_embed.timestep_embedder.linear_1.weight"] = state_dict.pop("t_embedder.mlp.0.weight")
-        converted_state_dict["time_embed.timestep_embedder.linear_1.bias"] = state_dict.pop("t_embedder.mlp.0.bias")
-        converted_state_dict["time_embed.timestep_embedder.linear_2.weight"] = state_dict.pop("t_embedder.mlp.2.weight")
-        converted_state_dict["time_embed.timestep_embedder.linear_2.bias"] = state_dict.pop("t_embedder.mlp.2.bias")
+        converted_state_dict["time_embed.timestep_embedder.linear_1.weight"] = (
+            state_dict.pop("t_embedder.mlp.0.weight")
+        )
+        converted_state_dict["time_embed.timestep_embedder.linear_1.bias"] = (
+            state_dict.pop("t_embedder.mlp.0.bias")
+        )
+        converted_state_dict["time_embed.timestep_embedder.linear_2.weight"] = (
+            state_dict.pop("t_embedder.mlp.2.weight")
+        )
+        converted_state_dict["time_embed.timestep_embedder.linear_2.bias"] = (
+            state_dict.pop("t_embedder.mlp.2.bias")
+        )
 
         # Guidance embedder for Sana Sprint
-        converted_state_dict["time_embed.guidance_embedder.linear_1.weight"] = state_dict.pop(
-            "cfg_embedder.mlp.0.weight"
+        converted_state_dict["time_embed.guidance_embedder.linear_1.weight"] = (
+            state_dict.pop("cfg_embedder.mlp.0.weight")
         )
-        converted_state_dict["time_embed.guidance_embedder.linear_1.bias"] = state_dict.pop("cfg_embedder.mlp.0.bias")
-        converted_state_dict["time_embed.guidance_embedder.linear_2.weight"] = state_dict.pop(
-            "cfg_embedder.mlp.2.weight"
+        converted_state_dict["time_embed.guidance_embedder.linear_1.bias"] = (
+            state_dict.pop("cfg_embedder.mlp.0.bias")
         )
-        converted_state_dict["time_embed.guidance_embedder.linear_2.bias"] = state_dict.pop("cfg_embedder.mlp.2.bias")
+        converted_state_dict["time_embed.guidance_embedder.linear_2.weight"] = (
+            state_dict.pop("cfg_embedder.mlp.2.weight")
+        )
+        converted_state_dict["time_embed.guidance_embedder.linear_2.bias"] = (
+            state_dict.pop("cfg_embedder.mlp.2.bias")
+        )
     else:
         # Original Sana time embedding structure
-        converted_state_dict["time_embed.emb.timestep_embedder.linear_1.weight"] = state_dict.pop(
-            "t_embedder.mlp.0.weight"
+        converted_state_dict["time_embed.emb.timestep_embedder.linear_1.weight"] = (
+            state_dict.pop("t_embedder.mlp.0.weight")
         )
-        converted_state_dict["time_embed.emb.timestep_embedder.linear_1.bias"] = state_dict.pop("t_embedder.mlp.0.bias")
-        converted_state_dict["time_embed.emb.timestep_embedder.linear_2.weight"] = state_dict.pop(
-            "t_embedder.mlp.2.weight"
+        converted_state_dict["time_embed.emb.timestep_embedder.linear_1.bias"] = (
+            state_dict.pop("t_embedder.mlp.0.bias")
         )
-        converted_state_dict["time_embed.emb.timestep_embedder.linear_2.bias"] = state_dict.pop("t_embedder.mlp.2.bias")
+        converted_state_dict["time_embed.emb.timestep_embedder.linear_2.weight"] = (
+            state_dict.pop("t_embedder.mlp.2.weight")
+        )
+        converted_state_dict["time_embed.emb.timestep_embedder.linear_2.bias"] = (
+            state_dict.pop("t_embedder.mlp.2.bias")
+        )
 
     # Shared norm.
-    converted_state_dict["time_embed.linear.weight"] = state_dict.pop("t_block.1.weight")
+    converted_state_dict["time_embed.linear.weight"] = state_dict.pop(
+        "t_block.1.weight"
+    )
     converted_state_dict["time_embed.linear.bias"] = state_dict.pop("t_block.1.bias")
 
     # y norm
-    converted_state_dict["caption_norm.weight"] = state_dict.pop("attention_y_norm.weight")
+    converted_state_dict["caption_norm.weight"] = state_dict.pop(
+        "attention_y_norm.weight"
+    )
 
     # scheduler
     if args.image_size == 4096:
@@ -134,7 +167,11 @@ def main(args):
         "SanaSprint_1600M_1024px_teacher",
     ]:
         layer_num = 20
-    elif args.model_type in ["SanaMS_600M_P1_D28", "SanaSprint_600M_P1_D28", "SanaSprint_600M_1024px_teacher"]:
+    elif args.model_type in [
+        "SanaMS_600M_P1_D28",
+        "SanaSprint_600M_P1_D28",
+        "SanaSprint_600M_1024px_teacher",
+    ]:
         layer_num = 28
     elif args.model_type == "SanaMS_4800M_P1_D60":
         layer_num = 60
@@ -150,61 +187,72 @@ def main(args):
         "SanaSprint_600M_1024px_teacher",
         "SanaSprint_1600M_1024px_teacher",
     ]
-    qk_norm = "rms_norm_across_heads" if args.model_type in qk_norm_model_types else None
+    qk_norm = (
+        "rms_norm_across_heads" if args.model_type in qk_norm_model_types else None
+    )
     timestep_scale = (
-        0.001 if args.model_type in ["SanaSprint_1600M_1024px_teacher", "SanaSprint_600M_1024px_teacher"] else 1.0
+        0.001
+        if args.model_type
+        in ["SanaSprint_1600M_1024px_teacher", "SanaSprint_600M_1024px_teacher"]
+        else 1.0
     )
 
     for depth in range(layer_num):
         # Transformer blocks.
-        converted_state_dict[f"transformer_blocks.{depth}.scale_shift_table"] = state_dict.pop(
-            f"blocks.{depth}.scale_shift_table"
+        converted_state_dict[f"transformer_blocks.{depth}.scale_shift_table"] = (
+            state_dict.pop(f"blocks.{depth}.scale_shift_table")
         )
 
         # Linear Attention is all you need 🤘
         # Self attention.
-        q, k, v = torch.chunk(state_dict.pop(f"blocks.{depth}.attn.qkv.weight"), 3, dim=0)
+        q, k, v = torch.chunk(
+            state_dict.pop(f"blocks.{depth}.attn.qkv.weight"), 3, dim=0
+        )
         converted_state_dict[f"transformer_blocks.{depth}.attn1.to_q.weight"] = q
         converted_state_dict[f"transformer_blocks.{depth}.attn1.to_k.weight"] = k
         converted_state_dict[f"transformer_blocks.{depth}.attn1.to_v.weight"] = v
         if qk_norm is not None:
             # Add Q/K normalization for self-attention (attn1) - needed for Sana-Sprint and Sana-1.5
-            converted_state_dict[f"transformer_blocks.{depth}.attn1.norm_q.weight"] = state_dict.pop(
-                f"blocks.{depth}.attn.q_norm.weight"
+            converted_state_dict[f"transformer_blocks.{depth}.attn1.norm_q.weight"] = (
+                state_dict.pop(f"blocks.{depth}.attn.q_norm.weight")
             )
-            converted_state_dict[f"transformer_blocks.{depth}.attn1.norm_k.weight"] = state_dict.pop(
-                f"blocks.{depth}.attn.k_norm.weight"
+            converted_state_dict[f"transformer_blocks.{depth}.attn1.norm_k.weight"] = (
+                state_dict.pop(f"blocks.{depth}.attn.k_norm.weight")
             )
         # Projection.
-        converted_state_dict[f"transformer_blocks.{depth}.attn1.to_out.0.weight"] = state_dict.pop(
-            f"blocks.{depth}.attn.proj.weight"
+        converted_state_dict[f"transformer_blocks.{depth}.attn1.to_out.0.weight"] = (
+            state_dict.pop(f"blocks.{depth}.attn.proj.weight")
         )
-        converted_state_dict[f"transformer_blocks.{depth}.attn1.to_out.0.bias"] = state_dict.pop(
-            f"blocks.{depth}.attn.proj.bias"
+        converted_state_dict[f"transformer_blocks.{depth}.attn1.to_out.0.bias"] = (
+            state_dict.pop(f"blocks.{depth}.attn.proj.bias")
         )
 
         # Feed-forward.
-        converted_state_dict[f"transformer_blocks.{depth}.ff.conv_inverted.weight"] = state_dict.pop(
-            f"blocks.{depth}.mlp.inverted_conv.conv.weight"
+        converted_state_dict[f"transformer_blocks.{depth}.ff.conv_inverted.weight"] = (
+            state_dict.pop(f"blocks.{depth}.mlp.inverted_conv.conv.weight")
         )
-        converted_state_dict[f"transformer_blocks.{depth}.ff.conv_inverted.bias"] = state_dict.pop(
-            f"blocks.{depth}.mlp.inverted_conv.conv.bias"
+        converted_state_dict[f"transformer_blocks.{depth}.ff.conv_inverted.bias"] = (
+            state_dict.pop(f"blocks.{depth}.mlp.inverted_conv.conv.bias")
         )
-        converted_state_dict[f"transformer_blocks.{depth}.ff.conv_depth.weight"] = state_dict.pop(
-            f"blocks.{depth}.mlp.depth_conv.conv.weight"
+        converted_state_dict[f"transformer_blocks.{depth}.ff.conv_depth.weight"] = (
+            state_dict.pop(f"blocks.{depth}.mlp.depth_conv.conv.weight")
         )
-        converted_state_dict[f"transformer_blocks.{depth}.ff.conv_depth.bias"] = state_dict.pop(
-            f"blocks.{depth}.mlp.depth_conv.conv.bias"
+        converted_state_dict[f"transformer_blocks.{depth}.ff.conv_depth.bias"] = (
+            state_dict.pop(f"blocks.{depth}.mlp.depth_conv.conv.bias")
         )
-        converted_state_dict[f"transformer_blocks.{depth}.ff.conv_point.weight"] = state_dict.pop(
-            f"blocks.{depth}.mlp.point_conv.conv.weight"
+        converted_state_dict[f"transformer_blocks.{depth}.ff.conv_point.weight"] = (
+            state_dict.pop(f"blocks.{depth}.mlp.point_conv.conv.weight")
         )
 
         # Cross-attention.
         q = state_dict.pop(f"blocks.{depth}.cross_attn.q_linear.weight")
         q_bias = state_dict.pop(f"blocks.{depth}.cross_attn.q_linear.bias")
-        k, v = torch.chunk(state_dict.pop(f"blocks.{depth}.cross_attn.kv_linear.weight"), 2, dim=0)
-        k_bias, v_bias = torch.chunk(state_dict.pop(f"blocks.{depth}.cross_attn.kv_linear.bias"), 2, dim=0)
+        k, v = torch.chunk(
+            state_dict.pop(f"blocks.{depth}.cross_attn.kv_linear.weight"), 2, dim=0
+        )
+        k_bias, v_bias = torch.chunk(
+            state_dict.pop(f"blocks.{depth}.cross_attn.kv_linear.bias"), 2, dim=0
+        )
 
         converted_state_dict[f"transformer_blocks.{depth}.attn2.to_q.weight"] = q
         converted_state_dict[f"transformer_blocks.{depth}.attn2.to_q.bias"] = q_bias
@@ -214,24 +262,28 @@ def main(args):
         converted_state_dict[f"transformer_blocks.{depth}.attn2.to_v.bias"] = v_bias
         if qk_norm is not None:
             # Add Q/K normalization for cross-attention (attn2) - needed for Sana-Sprint and Sana-1.5
-            converted_state_dict[f"transformer_blocks.{depth}.attn2.norm_q.weight"] = state_dict.pop(
-                f"blocks.{depth}.cross_attn.q_norm.weight"
+            converted_state_dict[f"transformer_blocks.{depth}.attn2.norm_q.weight"] = (
+                state_dict.pop(f"blocks.{depth}.cross_attn.q_norm.weight")
             )
-            converted_state_dict[f"transformer_blocks.{depth}.attn2.norm_k.weight"] = state_dict.pop(
-                f"blocks.{depth}.cross_attn.k_norm.weight"
+            converted_state_dict[f"transformer_blocks.{depth}.attn2.norm_k.weight"] = (
+                state_dict.pop(f"blocks.{depth}.cross_attn.k_norm.weight")
             )
 
-        converted_state_dict[f"transformer_blocks.{depth}.attn2.to_out.0.weight"] = state_dict.pop(
-            f"blocks.{depth}.cross_attn.proj.weight"
+        converted_state_dict[f"transformer_blocks.{depth}.attn2.to_out.0.weight"] = (
+            state_dict.pop(f"blocks.{depth}.cross_attn.proj.weight")
         )
-        converted_state_dict[f"transformer_blocks.{depth}.attn2.to_out.0.bias"] = state_dict.pop(
-            f"blocks.{depth}.cross_attn.proj.bias"
+        converted_state_dict[f"transformer_blocks.{depth}.attn2.to_out.0.bias"] = (
+            state_dict.pop(f"blocks.{depth}.cross_attn.proj.bias")
         )
 
     # Final block.
-    converted_state_dict["proj_out.weight"] = state_dict.pop("final_layer.linear.weight")
+    converted_state_dict["proj_out.weight"] = state_dict.pop(
+        "final_layer.linear.weight"
+    )
     converted_state_dict["proj_out.bias"] = state_dict.pop("final_layer.linear.bias")
-    converted_state_dict["scale_shift_table"] = state_dict.pop("final_layer.scale_shift_table")
+    converted_state_dict["scale_shift_table"] = state_dict.pop(
+        "final_layer.scale_shift_table"
+    )
 
     # Transformer
     with CTX():
@@ -241,8 +293,12 @@ def main(args):
             "num_attention_heads": model_kwargs[args.model_type]["num_attention_heads"],
             "attention_head_dim": model_kwargs[args.model_type]["attention_head_dim"],
             "num_layers": model_kwargs[args.model_type]["num_layers"],
-            "num_cross_attention_heads": model_kwargs[args.model_type]["num_cross_attention_heads"],
-            "cross_attention_head_dim": model_kwargs[args.model_type]["cross_attention_head_dim"],
+            "num_cross_attention_heads": model_kwargs[args.model_type][
+                "num_cross_attention_heads"
+            ],
+            "cross_attention_head_dim": model_kwargs[args.model_type][
+                "cross_attention_head_dim"
+            ],
             "cross_attention_dim": model_kwargs[args.model_type]["cross_attention_dim"],
             "caption_channels": 2304,
             "mlp_ratio": 2.5,
@@ -293,12 +349,22 @@ def main(args):
             )
         )
         transformer.save_pretrained(
-            os.path.join(args.dump_path, "transformer"), safe_serialization=True, max_shard_size="5GB"
+            os.path.join(args.dump_path, "transformer"),
+            safe_serialization=True,
+            max_shard_size="5GB",
         )
     else:
-        print(colored(f"Saving the whole Pipeline containing {args.model_type}", "green", attrs=["bold"]))
+        print(
+            colored(
+                f"Saving the whole Pipeline containing {args.model_type}",
+                "green",
+                attrs=["bold"],
+            )
+        )
         # VAE
-        ae = AutoencoderDC.from_pretrained("mit-han-lab/dc-ae-f32c32-sana-1.1-diffusers", torch_dtype=torch.float32)
+        ae = AutoencoderDC.from_pretrained(
+            "mit-han-lab/dc-ae-f32c32-sana-1.1-diffusers", torch_dtype=torch.float32
+        )
 
         # Text Encoder
         text_encoder_model_path = "Efficient-Large-Model/gemma-2-2b-it"
@@ -344,7 +410,9 @@ def main(args):
             elif args.scheduler_type == "flow-euler":
                 scheduler = FlowMatchEulerDiscreteScheduler(shift=flow_shift)
             else:
-                raise ValueError(f"Scheduler type {args.scheduler_type} is not supported")
+                raise ValueError(
+                    f"Scheduler type {args.scheduler_type} is not supported"
+                )
 
             pipe = SanaPipeline(
                 tokenizer=tokenizer,
@@ -354,7 +422,9 @@ def main(args):
                 scheduler=scheduler,
             )
 
-        pipe.save_pretrained(args.dump_path, safe_serialization=True, max_shard_size="5GB")
+        pipe.save_pretrained(
+            args.dump_path, safe_serialization=True, max_shard_size="5GB"
+        )
 
 
 DTYPE_MAPPING = {
@@ -368,7 +438,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--orig_ckpt_path", default=None, type=str, required=False, help="Path to the checkpoint to convert."
+        "--orig_ckpt_path",
+        default=None,
+        type=str,
+        required=False,
+        help="Path to the checkpoint to convert.",
     )
     parser.add_argument(
         "--image_size",
@@ -400,9 +474,25 @@ if __name__ == "__main__":
         choices=["flow-dpm_solver", "flow-euler", "scm"],
         help="Scheduler type to use. Use 'scm' for Sana Sprint models.",
     )
-    parser.add_argument("--dump_path", default=None, type=str, required=True, help="Path to the output pipeline.")
-    parser.add_argument("--save_full_pipeline", action="store_true", help="save all the pipelien elemets in one.")
-    parser.add_argument("--dtype", default="fp32", type=str, choices=["fp32", "fp16", "bf16"], help="Weight dtype.")
+    parser.add_argument(
+        "--dump_path",
+        default=None,
+        type=str,
+        required=True,
+        help="Path to the output pipeline.",
+    )
+    parser.add_argument(
+        "--save_full_pipeline",
+        action="store_true",
+        help="save all the pipelien elemets in one.",
+    )
+    parser.add_argument(
+        "--dtype",
+        default="fp32",
+        type=str,
+        choices=["fp32", "fp16", "bf16"],
+        help="Weight dtype.",
+    )
 
     args = parser.parse_args()
 
