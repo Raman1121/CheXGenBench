@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument(
         "--synthetic_prompts_col",
         type=str,
-        default="prompt",
+        default="annotated_prompt",
         help="Column name in the CSV file containing the prompts.",
     )
     parser.add_argument(
