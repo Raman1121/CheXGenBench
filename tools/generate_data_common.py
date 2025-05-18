@@ -52,7 +52,7 @@ def parse_args():
     parser.add_argument("--extra_info", type=str, default=None)
 
     parser.add_argument(
-        "--subset", type=int, default=2000, help="Create a smaller subset"
+        "--subset", type=int, default=None, help="Create a smaller subset"
     )
 
     return parser.parse_args()
@@ -365,6 +365,8 @@ def main(args):
     print(f"Loading CSV: {args.real_csv}")
     df = pd.read_csv(args.real_csv)
     print("Data loaded successfully!")
+
+    df = df.drop_duplicates(subset=['annotated_prompt']).reset_index(drop=True)
 
     if args.subset:
         print(f"!!! Creating a subset of {args.subset} samples")
