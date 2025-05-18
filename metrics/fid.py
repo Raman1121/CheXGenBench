@@ -155,7 +155,7 @@ def main(args):
     num_workers = args.num_workers
 
     # Paths to your CSV files
-    synthetic_csv = args.synthetic_csv  # Contains 'prompt' and 'img_savename'
+    synthetic_csv = args.synthetic_csv
     real_csv = args.real_csv
 
     ######### Real Data #########
@@ -211,7 +211,7 @@ def main(args):
         # Include only those images from the synthetic dataset that have the same prompts as the real dataset containing the pathology
         real_prompts = real_df[args.real_caption_col].to_list()
         synthetic_df = synthetic_df[
-            synthetic_df["prompt"].isin(real_prompts)
+            synthetic_df[args.synthetic_prompt_col].isin(real_prompts)
         ].reset_index(drop=True)
 
     real_image_paths = real_df[args.real_img_col].tolist()
@@ -419,6 +419,12 @@ if __name__ == "__main__":
         type=str,
         default="img_savename",
         help="Col name in synthetic CSV for image paths.",
+    )
+    parser.add_argument(
+        "--synthetic_prompt_col",
+        type=str,
+        default="annotated_prompt",
+        help="Col name in synthetic CSV for prompts.",
     )
     parser.add_argument(
         "--synthetic_img_dir", type=str, help="Directory containing synthetic images."
