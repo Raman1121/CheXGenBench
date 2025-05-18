@@ -49,7 +49,7 @@ def parse_args():
     parser.add_argument(
         "--synthetic_img_col",
         type=str,
-        default="img_savename",
+        default="synthetic_filename",
         help="Column name in the CSV file containing the image paths.",
     )
     parser.add_argument(
