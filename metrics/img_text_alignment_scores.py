@@ -205,7 +205,7 @@ def main(args):
 
         # Include only those images from the synthetic dataset that have the same prompts as the real dataset containing the pathology
         real_prompts = real_df[args.real_caption_col].to_list()
-        prompts_df = prompts_df[prompts_df["prompt"].isin(real_prompts)].reset_index(
+        prompts_df = prompts_df[prompts_df[args.synthetic_prompts_col].isin(real_prompts)].reset_index(
             drop=True
         )
 
