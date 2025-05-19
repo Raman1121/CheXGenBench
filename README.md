@@ -86,6 +86,20 @@ cd Benchmarking-Synthetic-Data
 
 The results would be stored in `Results/image_generation_metrics.csv`
 
+**Image-Text Alignment** We calculate the alignment between a synthetic image and a prompt using the [Bio-ViL-T](https://huggingface.co/microsoft/BiomedVLP-BioViL-T) model. Using this requires setting up a separate environment due to different dependencies. 
+
+1. Create a new conda environment `himl`
+2. Navigate to [health-multimodal repository](https://github.com/microsoft/hi-ml) and follow the instructions to install the required dependencies in `himl`.
+3. We have also provided a separate requirements file with the packages and their specific versions (untested).
+ ```
+conda activate himl
+pip install -r requirements_himl.txt
+```
+
+**When the environment is set-up, run the following command:**
+
+`./scripts/img_text_alignment.sh`
+
 **Conditional Analysis:** This level calculates each metric separately for each individual pathology present in the dataset. This allows for a detailed assessment of how well the T2I model generates synthetic data for specific medical conditions.
 
 ![](assets/images/conditional-metrics.png)
