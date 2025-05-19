@@ -52,6 +52,19 @@ We trained 11 different models for this work and the checkpoints are released [h
 
 This section provides instructions on how to use the benchmark to evaluate your Text-to-Image model's synthetic data.
 
+## Using a New Generative Model
+
+The benchmark currently supports SD V1.x, SD V2.x, SD V3.5, Pixart Sigma, RadEdit, Sana (0.6B), Lumina 2.0, Flux.1-Dev, LLM-CXR. 
+
+In order to add a new model in the benchmark, follow these (easy) steps. **Note:** We assume that training of your T2I model is conducted separately from the benchmark.
+
+- To generate images for calculating quantitative metrics (FID, KID, etc), define a new function in the `tools/generate_data_common.py` file that handles the checkpoint loading logic for the new model.
+
+- Add a new `if` statement in the `load_pipeline` function that calls this function.
+
+- Add the generation parameters (num_inference_steps, guidance_scale, etc) in the `PIPELINE_CONSTANTS` dictionary.
+
+
 ## Quantitative Analysis: Generation Fidelity
 
 ![](assets/images/sana-performance.png)
