@@ -27,32 +27,7 @@ conda activate myenv
 pip install -r requirements.txt
 ```
 
-## Generating Synthetic Data
-
-### Training Text-to-Image Models
-We trained 11 different models for this work and the checkpoints are released [here](https://huggingface.co/collections/raman07/chexgenbench-models-6823ec3c57b8ecbcc296e3d2). Training of T2I models de-coupled from this repository i.e. You can train your favourite T2I model using any framework of choice [Diffusers](https://github.com/huggingface/diffusers), [ai-toolkit](https://github.com/ostris/ai-toolkit), etc. 
-
-- **Downloading Training Images:** Download the MIMIC-CXR Dataset after accepting the license from [here](https://physionet.org/content/mimic-cxr/2.0.0/).
-- **Using LLaVA-Rad Annotations:** We used LLaVA-Rad Annotations because of enhanced caption quality. They are presented in the `MIMIC_Splits/` folder.
-    - `cd MIMIC_Splits/`
-    - `unzip llavarad_annotations.zip`
-    - You will see the following CSV files
-        - **Training CSV**: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TRAIN.csv`
-        - **Test CSV**: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv`
-
-- **Data Organization:** Once you have trained your T2I model, use the `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv` file to generate images for evaluation. Ensure that during generation, you save both the **original prompt** and the generated **synthetic image** in a CSV file (lets call it `prompt_INFO.csv`). Check out `tools/generate_data_common.py` for reference. 
-- Organize the synthetic data into a CSV file (`prompt_INFO.csv`) with the following columns:
-    - `'prompt'`: Contains the text prompt used for generation.
-    - `'img_savename'`: Contains the filename (or path) of the saved synthetic image.
-- **File Placement:** After generating all the synthetic images and creating the CSV file:
-    - Place the generated CSV file (`prompt_INFO.csv`) in the `assets/CSV` directory.
-    - Place all the generated synthetic image files in the `assets/synthetic_images` directory.
-
-# Usage
-
-This section provides instructions on how to use the benchmark to evaluate your Text-to-Image model's synthetic data.
-
-## Using a New Generative Model
+# Adding a New Generative Model
 
 The benchmark currently supports SD V1.x, SD V2.x, SD V3.5, Pixart Sigma, RadEdit, Sana (0.6B), Lumina 2.0, Flux.1-Dev, LLM-CXR. 
 
@@ -64,6 +39,30 @@ In order to add a new model in the benchmark, follow these (easy) steps. **Note:
 
 - Add the generation parameters (num_inference_steps, guidance_scale, etc) in the `PIPELINE_CONSTANTS` dictionary.
 
+## Generating Synthetic Data (Step 0)
+
+In order to evaluate T2I models, the first step is to generate synthetic images using a fixed set of prompts. Follow these steps to generate synthetic images to be used for evaluation.
+
+- **Downloading Training Images:** Download the MIMIC-CXR Dataset after accepting the license from [here](https://physionet.org/content/mimic-cxr/2.0.0/).
+- **Using LLaVA-Rad Annotations:** We used LLaVA-Rad Annotations because of enhanced caption quality. They are presented in the `MIMIC_Splits/` folder.
+    - `cd MIMIC_Splits/`
+    - `unzip llavarad_annotations.zip`
+    - You will see the following CSV files
+        - **Training CSV**: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TRAIN.csv`
+        - **Test CSV**: `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv`
+
+- **Data Organization:** Use the `MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv` file to generate images for evaluation. Follow the steps in the previous section to use `tools/generate_data_common.py` script to generate images.
+- Ensure that during generation, you save both the **original prompt** and the generated **synthetic image** in a CSV file (lets call it `prompt_INFO.csv`).
+- Organize the synthetic data into a CSV file (`prompt_INFO.csv`) with the following columns:
+    - `'prompt'`: Contains the text prompt used for generation.
+    - `'img_savename'`: Contains the filename (or path) of the saved synthetic image.
+- **File Placement:** After generating all the synthetic images and creating the CSV file:
+    - Place the generated CSV file (`prompt_INFO.csv`) in the `assets/CSV` directory.
+    - Place all the generated synthetic image files in the `assets/synthetic_images` directory.
+
+# Usage
+
+This section provides instructions on how to use the benchmark to evaluate your Text-to-Image model's synthetic data.
 
 ## Quantitative Analysis: Generation Fidelity
 
