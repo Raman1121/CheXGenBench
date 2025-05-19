@@ -140,7 +140,7 @@ unzip training_data_20K.zip
 ```
 
 - You can use the `tools/generate_data_common.py` file to generate synthetic images.
-- During generation, save the synthetic images in a folder (let' say `SYNTHETIC_IMAGES`)
+- During generation, save the synthetic images in a folder (let's say `SYNTHETIC_IMAGES`)
 - To run image classification using these images, 
     - `cd Downstream/Classification`
     - Set the paths in `/scripts/run_training_inference.sh`
