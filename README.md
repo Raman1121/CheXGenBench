@@ -137,3 +137,5 @@ For image classification, we used 20,000 samples from the MIMIC Dataset for trai
 ### Radiology Report Generation
 
 To fine-tune LLaVA-Rad, the first step is creating a *new* environment following the steps mentioned in the official [LLaVA-Rad repository](https://github.com/microsoft/LLaVA-Rad).
+
+For questions, please send your queries at <raman.dutt@ed.ac.uk>
