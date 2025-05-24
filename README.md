@@ -1,5 +1,7 @@
 # CheXGenBench: A Unified Benchmark For Fidelity, Privacy and Utility of Synthetic Chest Radiographs
 
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/chexgenbench-a-unified-benchmark-for-fidelity/conditional-text-to-image-synthesis-on-mimic)](https://paperswithcode.com/sota/conditional-text-to-image-synthesis-on-mimic?p=chexgenbench-a-unified-benchmark-for-fidelity)
+
 
 ![](assets/images/chexgenbench-overview.png)
 
