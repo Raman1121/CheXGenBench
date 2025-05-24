@@ -152,4 +152,15 @@ unzip training_data_20K.zip
 
 To fine-tune LLaVA-Rad, the first step is creating a *new* environment following the steps mentioned in the official [LLaVA-Rad repository](https://github.com/microsoft/LLaVA-Rad).
 
+
+If you found our work useful, please consider citing.
+
+```bibtex
+@article{dutt2025chexgenbench,
+  title={CheXGenBench: A Unified Benchmark For Fidelity, Privacy and Utility of Synthetic Chest Radiographs},
+  author={Dutt, Raman and Sanchez, Pedro and Yao, Yongchen and McDonagh, Steven and Tsaftaris, Sotirios A and Hospedales, Timothy},
+  journal={arXiv preprint arXiv:2505.10496},
+  year={2025}
+}
+```
 For questions, please send your queries at <raman.dutt@ed.ac.uk>

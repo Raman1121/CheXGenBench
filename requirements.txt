@@ -29,6 +29,7 @@ safetensors==0.5.3
 scikit-learn==1.6.1
 scipy==1.15.2
 sentencepiece==0.2.0
+seaborn
 termcolor==3.0.1
 timm==1.0.14
 tokenizers==0.21.1
