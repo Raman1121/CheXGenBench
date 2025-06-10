@@ -159,6 +159,10 @@ def main(args):
 
     text_inference = get_bert_inference()
     image_inference = get_image_inference()
+
+    text_inference.model.to('cuda')
+    image_inference.model.to('cuda')
+
     image_text_inference = ImageTextInferenceEngine(
         image_inference_engine=image_inference,
         text_inference_engine=text_inference,
