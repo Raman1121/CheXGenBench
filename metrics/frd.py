@@ -164,7 +164,7 @@ def main(
     if os.path.exists(savepath):
         print(f"Appending to existing results file found at {savepath}")
         results_df = pd.read_csv(savepath)
-        results_df.loc[results_df.index[-1], 'Alignment_score'] = mean_alignment_scores
+        results_df.loc[results_df.index[-1], 'FRD'] = frd
 
         if(args.experiment_type == 'conditional'):
             results_df.loc[results_df.index[-1], 'Pathology'] = args.pathology
@@ -173,7 +173,7 @@ def main(
         print(f"FRD Score saved to: {savepath}")
     else:
         results = {
-            "FRD": mean_alignment_scores,
+            "FRD": frd,
             "Extra Info": args.extra_info,
         }
         if(args.experiment_type == 'conditional'):
@@ -238,6 +238,13 @@ if __name__ == "__main__":
         type=str,
         default="annotated_prompt",
         help="Col name in real CSV for image paths.",
+    )
+
+    parser.add_argument(
+        "--results_savedir",
+        type=str,
+        default="Results",
+        help="Directory to save the results.",
     )
 
     parser.add_argument('--force_compute_fresh', action='store_true', help='re-compute all radiomics fresh')
