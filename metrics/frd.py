@@ -256,6 +256,17 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pathology", type=str, default='regular', help="Type of experiment to run (regular, conditional)"
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Debug mode to run on a small subset of data.",
+    )
+    parser.add_argument(
+        "--debug_samples", type=int, default=10, help="Debug Samples."
+    )
+    parser.add_argument(
+        "--extra_info", type=str, default="Some AI Model", help="Extra info to link the results with the specific model."
+    )
     
     args = parser.parse_args()
 
