@@ -19,3 +19,6 @@ echo "Calculating FID, KID, IS ..."
 
 echo "Calculating Image Text Alignment Scores ..."
 ./scripts/img_text_alignment.sh
+
+echo "Calculating the FRD Metric ..."
+./scripts/frd.sh
