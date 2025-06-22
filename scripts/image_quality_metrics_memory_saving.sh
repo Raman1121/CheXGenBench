@@ -33,3 +33,6 @@ python tools/combine_shards.py --shards_dir=$SHARDS_DIR --extra_info=$EXTRA_INFO
 # Calculate img-text alignment scores
 echo "Calculating Image Text Alignment Scores ..."
 ./scripts/img_text_alignment.sh
+
+# Calculate the FRD metric
+./scripts/frd.sh
