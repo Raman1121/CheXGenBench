@@ -154,6 +154,35 @@ def main(
 
     print("FRD = {}".format(frd))
 
+    # Save the results
+    savename = "conditional_image_generation_metrics.csv" if args.experiment_type == 'conditional' else "image_generation_metrics.csv"
+    if args.debug:
+        savename = "debug_" + savename
+    savepath = os.path.join(args.results_savedir, savename)
+
+    # Try to read if the dataframe already exists
+    if os.path.exists(savepath):
+        print(f"Appending to existing results file found at {savepath}")
+        results_df = pd.read_csv(savepath)
+        results_df.loc[results_df.index[-1], 'Alignment_score'] = mean_alignment_scores
+
+        if(args.experiment_type == 'conditional'):
+            results_df.loc[results_df.index[-1], 'Pathology'] = args.pathology
+        
+        results_df.to_csv(savepath, index=False)
+        print(f"FRD Score saved to: {savepath}")
+    else:
+        results = {
+            "FRD": mean_alignment_scores,
+            "Extra Info": args.extra_info,
+        }
+        if(args.experiment_type == 'conditional'):
+            results["Pathology"] = args.pathology
+
+        print("Creating new results file.")
+        results_df = pd.DataFrame([results])
+        results_df.to_csv(savepath, index=False)
+    
     if interpret:
         run_tsne = True
         interpret_radiomic_differences(radiomics_path1, radiomics_path2, run_tsne=run_tsne)
