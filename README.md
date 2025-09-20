@@ -1,23 +1,6 @@
 # CheXGenBench: A Unified Benchmark For Fidelity, Privacy and Utility of Synthetic Chest Radiographs
 
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/chexgenbench-a-unified-benchmark-for-fidelity/conditional-text-to-image-synthesis-on-mimic)](https://paperswithcode.com/sota/conditional-text-to-image-synthesis-on-mimic?p=chexgenbench-a-unified-benchmark-for-fidelity)
-
-
 ![](assets/images/chexgenbench-overview.png)
-
-[Check out the pre-print on Arxiv](https://www.arxiv.org/abs/2505.10496)
-
-## Fine-Tuned Checkpoints
-
-We provide different fine-tuned checkpoints as a collection on [HuggingFace](https://huggingface.co/collections/raman07/chexgenbench-models-6823ec3c57b8ecbcc296e3d2).
-
-## SynthCheX-75K Dataset
-We additionally release the SynthCheX-75K dataset comprising of >75K high-quality, synthetic radiographs using the best-performing model from our benchmark. The dataset is available for use on [HuggingFace](https://huggingface.co/datasets/raman07/SynthCheX-75K-v2).
-
-More details on the dataset are provided [here](SynthCheX_README.md).
-
-## CheXGenBench
-The benchmark is available [on GitHub](https://github.com/Raman1121/CheXGenBench).
 
 # Environment Setup
 - Python>=3.10.0
@@ -151,16 +134,3 @@ unzip training_data_20K.zip
 ### Radiology Report Generation
 
 To fine-tune LLaVA-Rad, the first step is creating a *new* environment following the steps mentioned in the official [LLaVA-Rad repository](https://github.com/microsoft/LLaVA-Rad).
-
-
-If you found our work useful, please consider citing.
-
-```bibtex
-@article{dutt2025chexgenbench,
-  title={CheXGenBench: A Unified Benchmark For Fidelity, Privacy and Utility of Synthetic Chest Radiographs},
-  author={Dutt, Raman and Sanchez, Pedro and Yao, Yongchen and McDonagh, Steven and Tsaftaris, Sotirios A and Hospedales, Timothy},
-  journal={arXiv preprint arXiv:2505.10496},
-  year={2025}
-}
-```
-For questions, please send your queries at <raman.dutt@ed.ac.uk>
