@@ -39,13 +39,6 @@ def parse_args():
         default=None,
         help="Directory containing the synthetic images.",
     )
-
-    parser.add_argument(
-        "--synthetic_prompts_col",
-        type=str,
-        default="annotated_prompt",
-        help="Column name in the CSV file containing the prompts.",
-    )
     parser.add_argument(
         "--synthetic_img_col",
         type=str,
