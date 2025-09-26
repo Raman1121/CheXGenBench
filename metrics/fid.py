@@ -351,6 +351,7 @@ def main(args):
         "Density": round(prdc_metrics["density"].item(), 3),
         "Coverage": round(prdc_metrics["coverage"].item(), 3),
         "Extra Info": args.extra_info,
+        "Caption Type": args.synthetic_prompt_col
     }
 
     if args.experiment_type == "conditional":
