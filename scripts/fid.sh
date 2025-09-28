@@ -4,7 +4,8 @@
 
 echo "SYNTHETIC CSV CSV: $SYNTHETIC_CSV"
 echo "SYNTHETIC IMG DIR: $SYNTHETIC_IMG_DIR"
-echo "SYNTHETIC PROMPT COL: $SYNTHETIC_PROMPT_COL"
+echo "TRAINING PROMPT: $TRAINING_PROMPT"
+echo "EVAL PROMPT: $EVAL_PROMPT"
 echo "REAL CSV: $REAL_CSV"
 echo "REAL IMG DIR: $REAL_IMG_DIR"
 echo "Saving Results at: $RESULTS_SAVEDIR"
@@ -21,4 +22,6 @@ python metrics/fid.py --synthetic_csv=$SYNTHETIC_CSV \
                         --experiment_type=$EXPERIMENT_TYPE \
                         --pathology="$PATHOLOGY" \
                         --num_shards=$NUM_SHARDS \
-                        --shard=$SHARD \
+                        --shard=$SHARD \ 
+                        --training_prompt=$TRAINING_PROMPT \
+                        --eval_prompt=$EVAL_PROMPT \

@@ -58,14 +58,14 @@ The quantitative analysis assesses the synthetic data at two distinct levels to 
 **Overall Analysis:** This level calculates metrics across the entire test dataset, consisting of all pathologies present in the MIMIC dataset. It provides a general indication of the synthetic data's overall quality.
 
 ```bash
-cd Benchmarking-Synthetic-Data
+cd CheXGenBench
 ./scripts/image_quality_metrics.sh
 ```
 
 **Important Note:** Calculating metrics like FID and KID can be computationally intensive and may lead to "Out of Memory" (OOM) errors, especially with large datasets (If using V100 GPUs or lower). If you encounter this issue, you can use the memory-saving version of the script:-
 
 ```bash
-cd Benchmarking-Synthetic-Data
+cd CheXGenBench
 ./scripts/image_quality_metrics_memory_saving.sh
 ```
 
@@ -90,7 +90,7 @@ pip install -r requirements_himl.txt
 ![](assets/images/conditional-metrics.png)
 
 ```bash
-cd Benchmarking-Synthetic-Data
+cd CheXGenBench
 ./scripts/image_quality_metrics_conditional.sh
 ```
 The results would be stored in `Results/conditional_image_generation_metrics.csv`
@@ -109,7 +109,7 @@ The results would be stored in `Results/conditional_image_generation_metrics.csv
 
 Run the following script to calculate privacy and patient re-identification metrics.
 ```bash
-cd Benchmarking-Synthetic-Data
+cd CheXGenBench
 ./scripts/privacy_metrics.sh
 ```
 

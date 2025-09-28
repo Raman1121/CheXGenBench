@@ -499,5 +499,18 @@ if __name__ == "__main__":
     )
     parser.add_argument("--debug_samples", type=int, default=100, help="Debug Samples.")
 
+    parser.add_argument(
+        "--training_prompt",
+        type=str,
+        default="Llavarad",
+        help="Prompts used for training the models.",
+    )
+    parser.add_argument(
+        "--eval_prompt",
+        type=str,
+        default="Llavarad",
+        help="Prompts used for evaluation (data generation).",
+    )
+
     args = parser.parse_args()
     main(args)

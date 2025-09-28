@@ -4,6 +4,9 @@ export SYNTHETIC_CSV="assets/CSV/prompt_INFO.csv"
 export SYNTHETIC_IMG_DIR="assets/synthetic_images/" # Assuming the synthetic images from your T2I model are in this folder. You can give a different folder path as well!
 export SYNTHETIC_PROMPT_COL="annotated_prompt"      # findings, annotated_prompt, medgemma_tt, medgemma_it
 
+export TRAINING_PROMPT="Llavarad"
+export EVAL_PROMPT="Llavarad"
+
 export REAL_CSV="MIMIC_Splits/LLAVARAD_ANNOTATIONS_TEST.csv"
 export REAL_IMG_DIR="<PATH-TO>/physionet.org/files/mimic-cxr-jpg/2.0.0"
 
