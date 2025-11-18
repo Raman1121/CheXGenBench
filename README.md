@@ -2,6 +2,25 @@
 
 ![](assets/images/chexgenbench-overview.png)
 
+
+## 🏆 Benchmark Leaderboard
+
+The following table ranks models based on the **FID (RadDino)** metric. Lower scores indicate better performance.
+
+| Rank | Model | Size | FID (RadDino) $\downarrow$ | Year |
+| :--- | :--- | :--- | :--- | :--- |
+| 🥇 | **Sana** | 0.60B | **54.23** | 2025 |
+| 🥈 | **Pixart Sigma** | 0.60B | 60.15 | 2024 |
+| 🥉 | **RadEdit** | 0.86B | 69.70 | 2024 |
+| 4 | LLM-CXR | 12B | 71.24 | 2024 |
+| 5 | SD V3.5 Medium | 2.50B | 91.30 | 2024 |
+| 6 | Lumina 2.0 | 2.60B | 101.20 | 2025 |
+| 7 | SD V1-5 | 0.86B | 118.93 | 2022 |
+| 8 | Flux.1-Dev | 12B | 122.40 | 2024 |
+| 9 | SD V1-4 | 0.86B | 125.19 | 2022 |
+| 10 | SD V2-1 | 0.86B | 186.53 | 2022 |
+| 11 | SD V2 | 0.86B | 194.72 | 2022 |
+
 # Environment Setup
 - Python>=3.10.0
 - Pytorch>=2.0.1+cu12.1
