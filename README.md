@@ -1,5 +1,7 @@
 # CheXGenBench: A Unified Benchmark For Fidelity, Privacy and Utility of Synthetic Chest Radiographs
 
+Update (2026/06): CheXGenBench is accepted into TMLR! ([OpenReview](https://openreview.net/forum?id=wrKmzYQACp))
+
 ![](assets/images/chexgenbench-overview.png)
 
 
@@ -153,3 +155,19 @@ unzip training_data_20K.zip
 ### Radiology Report Generation
 
 To fine-tune LLaVA-Rad, the first step is creating a *new* environment following the steps mentioned in the official [LLaVA-Rad repository](https://github.com/microsoft/LLaVA-Rad).
+
+## Citation
+
+If you find CheXGenBench useful in your research, please cite our official peer-reviewed paper:
+
+```bibtex
+@article{
+  dutt2026chexgenbench,
+  title={Che{XG}en{B}ench: A Unified Benchmark For Fidelity, Privacy and Utility of Synthetic Chest Radiographs},
+  author={Raman Dutt and Pedro Sanchez and Yongcheng Yao and Steven McDonagh and Sotirios A. Tsaftaris and Timothy Hospedales},
+  journal={Transactions on Machine Learning Research},
+  issn={2835-8856},
+  year={2026},
+  url={[https://openreview.net/forum?id=wrKmzYQACp](https://openreview.net/forum?id=wrKmzYQACp)},
+  note={}
+}
